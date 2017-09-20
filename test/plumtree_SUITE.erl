@@ -82,7 +82,7 @@ groups() ->
      {hyparview, [],
       [membership_simple_test,
        membership_high_client_test,
-       broadcast_simple_test, 
+       broadcast_simple_test,
        broadcast_high_active_test,
        broadcast_low_active_test,
        broadcast_high_client_test,
@@ -169,9 +169,9 @@ membership_test(Config) ->
 
     %% check membership after broadcast
     check_membership(Nodes),
-    
+
     %% now inject partitions in the broadcast tree until the graph is no longer connected
-    
+
     %% do some rounds of broadcast in order to repair the tree
     BroadcastRounds2 = rand_compat:uniform(100),
     lists:foreach(fun(_) ->
@@ -239,7 +239,7 @@ broadcast_test(Config) ->
     {_, RandomNode} = plumtree_test_utils:select_random(Nodes),
     ok = rpc:call(RandomNode,
                   plumtree_broadcast, broadcast,
-                  [{k, Rand}, plumtree_test_broadcast_handler]),  
+                  [{k, Rand}, plumtree_test_broadcast_handler]),
     ct:pal("requested node ~p to broadcast {k, ~p}",
            [RandomNode, Rand]),
 
@@ -472,7 +472,9 @@ cluster({_, Node}, {_, OtherNode}) ->
     ok = rpc:call(Node,
                   partisan_peer_service,
                   join,
-                  [{OtherNode, {127, 0, 0, 1}, PeerPort}]).
+                  [#{name => OtherNode,
+                     listen_addrs => [#{ip => {127, 0, 0, 1}, port => PeerPort}],
+                     parallelism => 1}]).
 
 %% @private
 codepath() ->
@@ -559,7 +561,7 @@ connect(G, N1, N2) ->
 %% @private
 check_membership(Nodes) ->
     check_membership(Nodes, [{fail, true}]).
-                     
+
 %% @private
 check_membership(Nodes, Opts) ->
     %% Verify connectedness.
