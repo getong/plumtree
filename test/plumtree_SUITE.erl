@@ -464,16 +464,16 @@ cluster({Name, _Node} = Myself, Nodes, Options) when is_list(Nodes) ->
                  end,
     lists:map(fun(OtherNode) -> cluster(Myself, OtherNode) end, OtherNodes).
 cluster({_, Node}, {_, OtherNode}) ->
-    PeerPort = rpc:call(OtherNode,
-                        partisan_config,
-                        get,
-                        [peer_port, ?PEER_PORT]),
-    ct:pal("Joining node: ~p to ~p at port ~p", [Node, OtherNode, PeerPort]),
+    ListenAddrs = rpc:call(OtherNode,
+                           partisan_config,
+                           get,
+                           [listen_addrs]),
+    ct:pal("Joining node: ~p to ~p at ~p", [Node, OtherNode, ListenAddrs]),
     ok = rpc:call(Node,
                   partisan_peer_service,
                   join,
                   [#{name => OtherNode,
-                     listen_addrs => [#{ip => {127, 0, 0, 1}, port => PeerPort}],
+                     listen_addrs => ListenAddrs,
                      parallelism => 1}]).
 
 %% @private
@@ -604,6 +604,8 @@ stop(Nodes) ->
     StopFun = fun({Name, _Node}) ->
         case ct_slave:stop(Name) of
             {ok, _} ->
+                ok;
+            {error, stop_timeout, _} ->
                 ok;
             Error ->
                 ct:fail(Error)
