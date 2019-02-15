@@ -139,7 +139,7 @@ start_link() ->
     InitLazys = [],
     plumtree_util:log(debug, "init peers, eager: ~p, lazy: ~p",
                       [InitEagers, InitLazys]),
-    Mods = app_helper:get_env(plumtree, broadcast_mods, []),
+    Mods = application:get_env(plumtree, broadcast_mods, []),
     Res = start_link(Members, InitEagers, InitLazys, Mods,
                      [{lazy_tick_period, LazyTickPeriod},
                       {exchange_tick_period, ExchangeTickPeriod}]),
@@ -473,7 +473,7 @@ maybe_exchange(undefined, State) ->
 maybe_exchange(Peer, State=#state{mods=[Mod | _], exchanges=Exchanges}) ->
     %% limit the number of exchanges this node can start concurrently.
     %% the exchange must (currently?) implement any "inbound" concurrency limits
-    ExchangeLimit = app_helper:get_env(plumtree, broadcast_start_exchange_limit, 1),
+    ExchangeLimit = application:get_env(plumtree, broadcast_start_exchange_limit, 1),
     BelowLimit = not (length(Exchanges) >= ExchangeLimit),
     FreeMod = lists:keyfind(Mod, 1, Exchanges) =:= false,
     case BelowLimit and FreeMod of
@@ -660,7 +660,7 @@ schedule_exchange_tick(Period) ->
     schedule_tick(exchange_tick, broadcast_exchange_timer, Period).
 
 schedule_tick(Message, Timer, Default) ->
-    TickMs = app_helper:get_env(plumtree, Timer, Default),
+    TickMs = application:get_env(plumtree, Timer, Default),
     erlang:send_after(TickMs, ?MODULE, Message).
 
 reset_peers(AllMembers, EagerPeers, LazyPeers, State) ->
