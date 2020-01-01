@@ -83,9 +83,9 @@ groups() ->
       [membership_simple_test,
        membership_high_client_test,
        broadcast_simple_test,
-       broadcast_high_active_test,
-       broadcast_low_active_test,
        broadcast_high_client_test,
+       broadcast_low_active_test,
+       broadcast_high_active_test,
        broadcast_high_client_high_active_test]}].
 
 broadcast_simple_test(Config) ->
@@ -95,15 +95,15 @@ broadcast_high_client_test(Config) ->
     broadcast_test([{n_clients, 11}] ++ Config).
 
 broadcast_high_active_test(Config) ->
-    broadcast_test([{max_active_size, 6},
+    broadcast_test([{max_active_size, 7},
                     {min_active_size, 6}] ++ Config).
 
 broadcast_low_active_test(Config) ->
-    broadcast_test([{max_active_size, 3},
+    broadcast_test([{max_active_size, 4},
                     {min_active_size, 3}] ++ Config).
 
 broadcast_high_client_high_active_test(Config) ->
-    broadcast_test([{max_active_size, 6},
+    broadcast_test([{max_active_size, 7},
                     {min_active_size, 6},
                     {n_clients, 11}] ++ Config).
 
