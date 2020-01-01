@@ -127,7 +127,7 @@ membership_high_client_test(Config) ->
 membership_test(Config) ->
     %% Use the default peer service manager.
     Manager = proplists:get_value(partisan_peer_service_manager,
-                                  Config, partisan_default_peer_service_manager),
+                                  Config, partisan_pluggable_peer_service_manager),
     NServers = proplists:get_value(n_servers, Config, 1),
     NClients = proplists:get_value(n_clients, Config, ?CLIENT_NUMBER),
     % Partition = proplists:get_value(partition, Config, false),
@@ -154,7 +154,7 @@ membership_test(Config) ->
     %% check membership after cluster
     check_membership(Nodes),
 
-    BroadcastRounds1 = rand_compat:uniform(100),
+    BroadcastRounds1 = rand:uniform(100),
     ct:pal("now doing ~p rounds of broadcast",
            [BroadcastRounds1]),
     %% do several rounds of broadcast from random nodes, then wait a bit for propagation
@@ -162,7 +162,7 @@ membership_test(Config) ->
                     {_, Node} = plumtree_test_utils:select_random(Nodes),
                     ok = rpc:call(Node,
                                   plumtree_broadcast, broadcast,
-                                  [{k, rand_compat:uniform()}, plumtree_test_broadcast_handler])
+                                  [{k, rand:uniform()}, plumtree_test_broadcast_handler])
                   end, lists:seq(1, BroadcastRounds1)),
     %% allow 100ms per broadcast to settle
     timer:sleep(100 * BroadcastRounds1),
@@ -173,12 +173,12 @@ membership_test(Config) ->
     %% now inject partitions in the broadcast tree until the graph is no longer connected
 
     %% do some rounds of broadcast in order to repair the tree
-    BroadcastRounds2 = rand_compat:uniform(100),
+    BroadcastRounds2 = rand:uniform(100),
     lists:foreach(fun(_) ->
                     {_, Node} = plumtree_test_utils:select_random(Nodes),
                     ok = rpc:call(Node,
                                   plumtree_broadcast, broadcast,
-                                  [{k, rand_compat:uniform()}, plumtree_test_broadcast_handler])
+                                  [{k, rand:uniform()}, plumtree_test_broadcast_handler])
                   end, lists:seq(1, BroadcastRounds2)),
     %% allow 100ms per broadcast to settle
     timer:sleep(100 * BroadcastRounds1),
@@ -190,7 +190,7 @@ membership_test(Config) ->
 broadcast_test(Config) ->
     %% Use the default peer service manager.
     Manager = proplists:get_value(partisan_peer_service_manager,
-                                  Config, partisan_default_peer_service_manager),
+                                  Config, partisan_pluggable_peer_service_manager),
     NServers = proplists:get_value(n_servers, Config, 1),
     NClients = proplists:get_value(n_clients, Config, ?CLIENT_NUMBER),
     Partition = proplists:get_value(partition, Config, false),
@@ -221,12 +221,12 @@ broadcast_test(Config) ->
     maybe_resolve_partition(Partition, Reference, Manager, Nodes),
 
     %% do several rounds of broadcast from random nodes, then wait a bit for propagation
-    BroadcastRounds1 = rand_compat:uniform(100),
+    BroadcastRounds1 = rand:uniform(100),
     lists:foreach(fun(_) ->
                     {_, Node} = plumtree_test_utils:select_random(Nodes),
                     ok = rpc:call(Node,
                                   plumtree_broadcast, broadcast,
-                                  [{k, rand_compat:uniform()}, plumtree_test_broadcast_handler])
+                                  [{k, rand:uniform()}, plumtree_test_broadcast_handler])
                   end, lists:seq(1, BroadcastRounds1)),
     %% allow 500ms per broadcast to settle
     timer:sleep(200 * BroadcastRounds1),
@@ -235,7 +235,7 @@ broadcast_test(Config) ->
     check_membership(Nodes),
 
     %% do a final round of broadcast, also from a random node, which is the one we'll be checking
-    Rand = rand_compat:uniform(),
+    Rand = rand:uniform(),
     {_, RandomNode} = plumtree_test_utils:select_random(Nodes),
     ok = rpc:call(RandomNode,
                   plumtree_broadcast, broadcast,
@@ -434,7 +434,7 @@ cluster({Name, _Node} = Myself, Nodes, Options) when is_list(Nodes) ->
     AmIClient = lists:member(Name, Clients),
 
     OtherNodes = case Manager of
-                     partisan_default_peer_service_manager ->
+                     partisan_pluggable_peer_service_manager ->
                          %% Omit just ourselves.
                          omit([Name], Nodes);
                      partisan_client_server_peer_service_manager ->

@@ -159,7 +159,7 @@ select_random(List0, Omit) ->
     List = List0 -- lists:flatten([Omit]),
     %% Catch exceptions where there may not be enough members.
     try
-        Index = rand_compat:uniform(length(List)),
+        Index = rand:uniform(length(List)),
         lists:nth(Index, List)
     catch
         _:_ ->
