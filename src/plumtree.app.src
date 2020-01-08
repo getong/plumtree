@@ -6,7 +6,5 @@
               {mod,{plumtree_app,[]}},
               {modules,[]},
               {env,[{plumtree_data_dir,"data"}]},
-              {maintainers,["Chris Meiklejohn","Tom Santero",
-                            "Andrew Thompson"]},
               {licenses,["Apache 2.0"]},
               {links,[{"Github","https://github.com/lasp-lang/plumtree"}]}]}.
